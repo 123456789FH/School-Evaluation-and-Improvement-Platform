@@ -56,3 +56,20 @@
 .solution-meta span{background:#f3f7f5;border:1px solid #e0e8e4;padding:7px 10px;border-radius:10px;font-size:12px}
 @media (max-width:900px){.decision-grid{grid-template-columns:1fr 1fr!important}}
 @media (max-width:620px){.decision-grid{grid-template-columns:1fr!important}.case-card .grid-2{grid-template-columns:1fr!important}}
+
+/* V3.3 — ذكاء المؤشرات والشواهد (إضافات وظيفية دون تغيير الهوية) */
+.verification-box{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:rgba(15,107,75,.035)}
+.verification-box summary{cursor:pointer;font-weight:800;color:var(--green-dark);list-style:none}
+.verification-box summary::-webkit-details-marker{display:none}
+.verification-list{display:grid;gap:7px;margin:10px 0;font-size:13px;color:var(--text-soft)}
+.verification-results{margin-top:14px;padding:13px;border-radius:14px;background:var(--soft);border:1px solid var(--line)}
+.verify-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px dashed rgba(15,107,75,.12);font-size:13px}
+.verify-row:last-of-type{border-bottom:0}.verify-row.ok{color:var(--green-dark)}.verify-row.miss{color:#805d27}
+.suggest-links{margin-top:14px;padding:13px;border:1px solid rgba(181,135,43,.28);border-radius:14px;background:rgba(246,231,177,.18)}
+.suggest-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(181,135,43,.22)}
+.suggest-row:last-child{border-bottom:0}.suggest-row small{display:block;color:var(--text-soft);margin-top:3px}
+.evidence-link-list{display:grid;gap:8px;max-height:55vh;overflow:auto;padding-inline-end:4px}
+.link-check{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.link-check input{margin-top:4px;transform:scale(1.1)}
+.evidence-card .top{align-items:flex-start}.evidence-card .score-badge{flex:0 0 auto}
+@media(max-width:700px){.suggest-row{align-items:flex-start;flex-direction:column}.evidence-link-list{max-height:48vh}}
