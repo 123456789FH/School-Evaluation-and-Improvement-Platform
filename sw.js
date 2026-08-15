@@ -1,12 +1,12 @@
-const CACHE='school-improvement-v4.1.0';
+const CACHE='school-improvement-v4.2.0';
 const CORE=[
   './','index.html','manifest.json',
   'assets/css/styles.css',
   'assets/js/data.js','assets/js/storage.js','assets/js/engine.js',
-  'assets/js/document-intelligence.js','assets/js/report-export.js','assets/js/app.js',
-  'assets/icons/icon-192.png','assets/icons/icon-512.png'
+  'assets/js/document-intelligence.js','assets/js/report-export.js','assets/js/app.js','assets/js/v4-ui.js',
+  'assets/icons/icon-192.png','assets/icons/icon-512.png',
+  'assets/images/leadership-hero.png'
 ];
-
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
     const cache=await caches.open(CACHE);
@@ -14,12 +14,11 @@ self.addEventListener('install',event=>{
       try{
         const response=await fetch(url,{cache:'reload'});
         if(response.ok)await cache.put(url,response.clone());
-      }catch(_){/* installation should not fail because one optional asset is unavailable */}
+      }catch(_){}
     }));
     await self.skipWaiting();
   })());
 });
-
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{
     const keys=await caches.keys();
@@ -27,7 +26,6 @@ self.addEventListener('activate',event=>{
     await self.clients.claim();
   })());
 });
-
 async function networkFirst(request){
   const cache=await caches.open(CACHE);
   try{
@@ -38,7 +36,6 @@ async function networkFirst(request){
     return (await cache.match(request)) || (request.mode==='navigate' ? await cache.match('./') : Response.error());
   }
 }
-
 async function staleWhileRevalidate(request){
   const cache=await caches.open(CACHE);
   const cached=await cache.match(request);
@@ -48,21 +45,12 @@ async function staleWhileRevalidate(request){
   }).catch(()=>null);
   return cached || await update || Response.error();
 }
-
 self.addEventListener('fetch',event=>{
   const request=event.request;
   if(request.method!=='GET')return;
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
-
-  const isFreshCritical=
-    request.mode==='navigate' ||
-    /\.(?:html?|css|js|json)$/i.test(url.pathname) ||
-    url.pathname.endsWith('/');
-
-  event.respondWith(isFreshCritical ? networkFirst(request) : staleWhileRevalidate(request));
+  const critical=request.mode==='navigate'||/\.(?:html?|css|js|json)$/i.test(url.pathname)||url.pathname.endsWith('/');
+  event.respondWith(critical?networkFirst(request):staleWhileRevalidate(request));
 });
-
-self.addEventListener('message',event=>{
-  if(event.data==='SKIP_WAITING')self.skipWaiting();
-});
+self.addEventListener('message',event=>{if(event.data==='SKIP_WAITING')self.skipWaiting();});
