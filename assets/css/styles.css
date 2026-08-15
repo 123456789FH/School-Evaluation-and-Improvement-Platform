@@ -74,3 +74,9 @@
 .link-check input{margin-top:4px;transform:scale(1.1)}
 .evidence-card .top{align-items:flex-start}.evidence-card .score-badge{flex:0 0 auto}
 @media(max-width:700px){.suggest-row{align-items:flex-start;flex-direction:column}.evidence-link-list{max-height:48vh}}
+/* V3.5 — الخطط المدرسية المتكاملة */
+.plan-overview{border-top:5px solid var(--green-600);background:linear-gradient(180deg,#fff,#fbfefc)}
+.plan-program-card{border-inline-start:5px solid #d7eadf}.plan-program-card .analysis-details{background:#fbfdfc}
+.plan-program-card .card-actions{margin-top:14px}.plan-program-card .small-value{font-size:20px!important}
+.modal{width:min(960px,100%)}
+@media(max-width:700px){.plan-program-card .grid-4{grid-template-columns:1fr 1fr}.modal{padding:15px}.plan-program-card .card-actions{display:grid;grid-template-columns:1fr 1fr}.plan-program-card .card-actions .btn{width:100%}}
