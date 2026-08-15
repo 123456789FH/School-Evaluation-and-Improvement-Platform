@@ -5,6 +5,7 @@ const has=v=>v!==''&&v!==null&&v!==undefined&&!Number.isNaN(+v);
 const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,N(v)));
 const avg=a=>a.length?a.reduce((s,v)=>s+N(v),0)/a.length:0;
 const unique=a=>[...new Set(a.filter(Boolean))];
+function evidenceScoreForIndicator(e,id){return N(e?.analyses?.[id]?.score??e?.score)}
 const daysBetween=(a,b)=>{if(!a||!b)return 0;return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000)};
 const today=()=>new Date().toISOString().slice(0,10);
 const SCHOOL_BANDS=[
@@ -57,7 +58,7 @@ function assessmentSummary(state,standards){
  const performance=answered.length?avg(answered.map(x=>x.level/4*100)):0;
  const readiness=performance*completion/100;
  const evidenceCoverage=answered.length?answered.filter(x=>x.evidence.length).length/answered.length*100:0;
- const weakEvidence=rows.reduce((n,x)=>n+x.evidence.filter(e=>N(e.score)<45).length,0);
+ const weakEvidence=rows.reduce((n,x)=>n+x.evidence.filter(e=>evidenceScoreForIndicator(e,x.i.id)<45).length,0);
  const classification=schoolClassification(performance,completion);
  const domains=standards.map(d=>{
    const ids=new Set(d.standards.flatMap(s=>s.indicators.map(i=>i.id)));
@@ -299,7 +300,7 @@ function crossAnalysis(state,standards){
 }
 function contradictions(state,standards){
  const out=[],A=assessmentSummary(state,standards);
- A.rows.forEach(row=>{if(row.level===4&&row.evidence.length&&row.evidence.every(e=>N(e.score)<45))out.push({type:'assessment-evidence',title:row.i.text,message:'التقييم الداخلي مرتفع (٤/٤) لكن جميع الشواهد المرتبطة ضعيفة الملاءمة؛ راجعي التقدير أو استكملي الدليل.'})});
+ A.rows.forEach(row=>{if(row.level===4&&row.evidence.length&&row.evidence.every(e=>evidenceScoreForIndicator(e,row.i.id)<45))out.push({type:'assessment-evidence',title:row.i.text,message:'التقييم الداخلي مرتفع (٤/٤) لكن جميع الشواهد المرتبطة بهذا المؤشر ضعيفة الملاءمة؛ راجعي التقدير أو استكملي الدليل.'})});
  (state.operationalPlan||[]).forEach(x=>{const a=operationalItem(x);if(x.status==='done'&&a.achievement!==null&&a.achievement<75)out.push({type:'operational-status',title:x.title,message:'البند مسجل «مكتمل» لكن التقدم المحسوب من خط الأساس إلى المستهدف أقل من ٧٥٪.'})});
  (state.professional||[]).forEach(x=>{if(x.status==='done'&&!has(x.post))out.push({type:'professional-measure',title:x.title,message:'النشاط المهني مسجل منفذًا دون قياس بعدي؛ التنفيذ لا يساوي تحقق الأثر.'})});
  (state.improvements||[]).forEach(x=>{if(x.status==='done'&&!has(x.post))out.push({type:'improvement-measure',title:x.title,message:'خطة التحسين مغلقة دون قياس بعدي؛ لا يمكن الحكم على نجاحها.'})});

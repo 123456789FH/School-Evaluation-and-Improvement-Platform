@@ -1,4 +1,4 @@
-window.APP_VERSION='3.2.1';
+window.APP_VERSION='3.3.0';
 window.DEFAULT_SETTINGS={
   schoolName:'منصة التقويم والتحسين المدرسي',
   schoolDisplayName:'مدرستي',
