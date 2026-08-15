@@ -1,4 +1,4 @@
-window.APP_VERSION='3.3.0';
+window.APP_VERSION='3.4.0';
 window.DEFAULT_SETTINGS={
   schoolName:'منصة التقويم والتحسين المدرسي',
   schoolDisplayName:'مدرستي',
@@ -184,7 +184,7 @@ window.NAFS_2026={
  }
 };
 
-window.PLAN_TYPES={guidance:{label:'التوجيه الطلابي',icon:'🧭'},activity:{label:'النشاط الطلابي',icon:'🎨'},gifted:{label:'رعاية الموهوبين',icon:'💎'}};
+window.PLAN_TYPES={guidance:{label:'التوجيه الطلابي',icon:'🧭'},activity:{label:'النشاط الطلابي',icon:'🎨'},gifted:{label:'رعاية الموهوبين',icon:'💎'},health:{label:'الإرشاد الصحي',icon:'🩺'}};
 window.PD_TYPES={course:'دورة / ورشة',exchange:'زيارة تبادلية',lesson:'حصة تطبيقية',plc:'مجتمع تعلم مهني'};
 window.EVENT_PRESETS=['اليوم الوطني','يوم التأسيس','يوم العلم','يوم المعلم','اليوم العالمي للتطوع','اليوم العالمي للغة العربية','أسبوع الموهبة','اليوم العالمي للصحة النفسية'];
-window.SAT_GROUPS=['الطلاب والطالبات','أولياء الأمور','المعلمون والمعلمات','الموظفون','المشاركون في الدورات','المستفيدون من البرامج والفعاليات'];
+window.SAT_GROUPS=['الطلاب','أولياء الأمور','المعلمون','الموظفون','المشاركون في الدورات','المستفيدون من البرامج والفعاليات'];
