@@ -1,12 +1,12 @@
 {
   "name": "منصة التقويم والتحسين المدرسي",
-  "short_name": "مدرستي تتطور",
+  "short_name": "مدرستي تتطور V4",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f6f8f7",
+  "background_color": "#f7f9f8",
   "theme_color": "#0f6b4b",
   "icons": [
     {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png"},
