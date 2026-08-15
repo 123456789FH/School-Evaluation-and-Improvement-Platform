@@ -174,7 +174,7 @@
 
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
     window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('./sw.js?v=4.2.0',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{});
+      navigator.serviceWorker.register('./sw.js?v=4.2.1',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{});
     });
   }
 })();
