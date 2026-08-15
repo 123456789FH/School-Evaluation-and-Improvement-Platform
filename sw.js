@@ -1,4 +1,4 @@
-const CACHE='school-improvement-v4.2.1';
+const CACHE='school-improvement-v4.3.0';
 const CORE=[
   './','index.html','manifest.json',
   'assets/css/styles.css',
