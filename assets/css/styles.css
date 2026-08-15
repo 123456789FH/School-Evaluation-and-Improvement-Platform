@@ -58,6 +58,7 @@
 @media (max-width:620px){.decision-grid{grid-template-columns:1fr!important}.case-card .grid-2{grid-template-columns:1fr!important}}
 
 /* V3.3 — ذكاء المؤشرات والشواهد (إضافات وظيفية دون تغيير الهوية) */
+/* V3.4 — تقارير Office الحقيقية + الإرشاد الصحي + خطاب موحد بصيغة المذكر */
 .verification-box{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:rgba(15,107,75,.035)}
 .verification-box summary{cursor:pointer;font-weight:800;color:var(--green-dark);list-style:none}
 .verification-box summary::-webkit-details-marker{display:none}
