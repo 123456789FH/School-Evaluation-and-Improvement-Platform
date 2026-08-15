@@ -12,7 +12,7 @@ const emptyState=()=>({
  nafs:[],
  treatmentPlans:[],
  schoolPlans:[],
- sectionPlans:{guidance:{},activity:{},gifted:{},health:{}},
+ sectionPlans:{guidance:{},activity:{},gifted:{},health:{},leadership:{},partnership:{},volunteer:{},ai:{}},
  operationalPlan:[],
  manualSwot:{strengths:[],weaknesses:[],opportunities:[],threats:[]},
  analysisHistory:[],

@@ -35,6 +35,10 @@ const TOPICS={
  gifted:{label:'رعاية الموهوبين',keywords:['موهوب','الموهوبين','الموهوبات','موهبة','إثرائية','ابتكار']},
  activity:{label:'النشاط والمشاركة',keywords:['النشاط','الأنشطة','مشاركة','تطوع','تطوعية','فعالية']},
  health:{label:'الإرشاد الصحي',keywords:['إرشاد صحي','ارشاد صحي','الصحة المدرسية','توعية صحية','صحي','الصحة','تغذية','وقاية','نمط صحي']},
+ leadership:{label:'القيادة المدرسية',keywords:['القيادة المدرسية','مدير المدرسة','وكيل المدرسة','قيادة الرؤية','قيادة الخطة','تمكين المعلمين','فرق العمل','قيادة تعليمية']},
+ partnership:{label:'الشراكة المجتمعية',keywords:['شراكة','الشراكة المجتمعية','شريك','أولياء الأمور','المجتمع المحلي','جهة شريكة','مؤسسة مجتمعية']},
+ volunteer:{label:'الأعمال التطوعية',keywords:['تطوع','تطوعية','ساعات تطوعية','خدمة المجتمع','مبادرة تطوعية','فرصة تطوعية']},
+ ai:{label:'الذكاء الاصطناعي والبرمجة',keywords:['ذكاء اصطناعي','الذكاء الاصطناعي','ساعة البرمجة','برمجة','روبوت','تفكير حاسوبي','مشروع رقمي','أمن رقمي']},
  family:{label:'مشاركة الأسرة والشراكة',keywords:['الأسرة','أولياء','ولي الأمر','الشراكة','المجتمع']},
  safety:{label:'البيئة والأمن والسلامة',keywords:['سلامة','الأمن','المبنى','الصيانة','النظافة','المرافق']},
  digital:{label:'التقنية والتحول الرقمي',keywords:['تقنية','رقمية','رقمي','منصات','ذكاء اصطناعي']},
@@ -184,7 +188,26 @@ function schoolPlanItem(x){
  if(x.status==='done'&&!String(x.results||'').trim()){risk+=12;reasons.push('النتيجة الختامية للبرنامج غير موثقة.');}
  if(overdue){risk+=25;reasons.push('موعد التنفيذ انتهى والبرنامج غير مكتمل.');}
  if(risk>=45&&!String(x.rootCause||'').trim())reasons.push('توجد فجوة مرتفعة دون سبب جذري موثق؛ يلزم التحقق قبل تكرار التدخل.');
- const required=['title','goal','targetGroup','successIndicator','owner'];let complete=required.filter(k=>String(x[k]||'').trim()).length;
+ const specialRequired=[];
+ if(x.type==='partnership'){
+  specialRequired.push('partnerOrg','partnerContribution');
+  if(!String(x.partnerOrg||'').trim()){risk+=10;reasons.push('الجهة الشريكة غير موثقة؛ يصعب تقييم مسؤوليات الشراكة.');}
+  if(!String(x.partnerContribution||'').trim()){risk+=8;reasons.push('مساهمة الشريك غير محددة بوضوح.');}
+  if(x.status==='done'&&!String(x.sustainability||'').trim()){risk+=6;reasons.push('قرار استدامة الشراكة أو تجديدها غير موثق.');}
+ }
+ if(x.type==='volunteer'){
+  specialRequired.push('volunteerHours','beneficiary');
+  if(x.status==='done'&&!has(x.volunteerHours)){risk+=9;reasons.push('الساعات التطوعية غير موثقة.');}
+  if(!String(x.beneficiary||'').trim()){risk+=7;reasons.push('الجهة أو الفئة المستفيدة غير محددة.');}
+  if(x.status==='done'&&!String(x.communityImpact||'').trim()){risk+=12;reasons.push('الأثر المجتمعي غير موثق؛ لا يكفي عدد الساعات وحده للحكم على النجاح.');}
+ }
+ if(x.type==='ai'){
+  specialRequired.push('digitalSkill','digitalProduct');
+  if(!String(x.digitalSkill||'').trim()){risk+=10;reasons.push('المهارة الرقمية المستهدفة غير محددة.');}
+  if(x.status==='done'&&!String(x.digitalProduct||'').trim()){risk+=12;reasons.push('البرنامج مكتمل دون توثيق منتج أو مهمة أدائية رقمية.');}
+  if(x.status==='done'&&!has(x.completionRate)){risk+=6;reasons.push('نسبة إكمال البرنامج غير موثقة.');}
+ }
+ const required=['title','goal','targetGroup','successIndicator','owner',...specialRequired];let complete=required.filter(k=>String(x[k]??'').trim()).length;
  if(pre!==null)complete++;if(target!==null)complete++;if(x.status!=='done'||post!==null)complete++;if(evidenceCount>0)complete++;
  const completeness=complete/(required.length+4)*100;
  const label=risk>=70?'حرج':risk>=45?'يحتاج تعديلًا':risk>=25?'يحتاج متابعة':x.status==='done'?'محقق بصورة مستقرة':'مستقر';
@@ -194,6 +217,9 @@ function schoolPlanItem(x){
  if(post===null&&x.status==='done')recommendations.push('نفذ قياسًا بعديًا مرتبطًا بنفس المؤشر الذي قيس قبليًا.');
  if(post!==null&&target!==null&&!targetReached)recommendations.push('حلل سبب الفجوة وعدل التدخل قبل تكراره ثم أعد القياس.');
  if(evidenceCount===0)recommendations.push('أرفق شاهدًا مباشرًا للتنفيذ والنتيجة وقياس الأثر.');
+ if(x.type==='partnership'&&!String(x.sustainability||'').trim())recommendations.push('حدد قرار الاستدامة أو التجديد بناءً على أثر الشراكة ورضا الأطراف.');
+ if(x.type==='volunteer'&&x.status==='done'&&!String(x.communityImpact||'').trim())recommendations.push('أضف مؤشر أثر مجتمعي يوضح ما تغير لدى المستفيد، وليس عدد الساعات فقط.');
+ if(x.type==='ai'&&x.status==='done'&&!String(x.digitalProduct||'').trim())recommendations.push('وثق منتجًا أو مهمة أدائية تثبت اكتساب المهارة الرقمية.');
  if(!recommendations.length)recommendations.push('استمر في البرنامج ووثق عناصر النجاح لإعادة استخدامها في الخطط القادمة.');
  const action=risk>=70?'إجراء تصحيحي عاجل: تثبيت السبب الجذري، تعديل التدخل، ثم قياس قصير المدى':risk>=45?'مراجعة تصميم البرنامج والفئة ومؤشر النجاح، ثم تعديل التنفيذ وإعادة القياس':risk>=25?'استكمال القياس والشواهد والمتابعة قبل إغلاق البرنامج':'استدامة البرنامج مع توثيق عناصر النجاح وقياس الأثر';
  return{participationRatio:ratio,pre,target,post,direction,rawDelta,delta,gap,targetReached,satisfaction,evidenceCount,completeness,overdue,risk:clamp(risk),label,reasons,action,recommendations};
@@ -251,7 +277,7 @@ function priorities(state,standards){
  operationalSummary(state).items.forEach(({item,analysis})=>{if(analysis.risk>=35)list.push({id:`operational:${item.id}`,source:'operational',sourceId:item.id,title:`الخطة التشغيلية: ${item.title}`,score:analysis.risk,reason:analysis.reasons.join(' '),action:analysis.action,pre:analysis.actual??'',target:analysis.target??'',topic:topicOf({title:`${item.axis} ${item.title} ${item.kpi}`})})});
  const Sat=satisfactionSummary(state);if(Sat.avg>0&&Sat.avg<82)list.push({id:'satisfaction:overall',source:'satisfaction',sourceId:Sat.low?.id||'',title:'تحسين رضا المستفيدين',score:clamp((85-Sat.avg)*4+35),reason:`متوسط الرضا ${Sat.avg.toFixed(1)}٪ وأقل قياس هو ${Sat.low?.title||'غير محدد'}.`,action:'تحليل الملاحظات المتكررة وتنفيذ تحسين خدمي ثم إعادة القياس.',pre:Sat.avg,target:85,topic:'satisfaction'});
  (state.improvements||[]).forEach(x=>{const im=improvementImpact(x);if(x.status==='done'&&im.post!==null&&!im.achieved)list.push({id:`improvement:${x.id}`,source:'improvement',sourceId:x.id,title:`مراجعة خطة تحسين: ${x.title}`,score:im.delta!==null&&im.delta<=0?80:55,reason:`الخطة اكتملت ولكن ${im.effectiveness}.`,action:'مراجعة السبب الجذري وملاءمة التدخل قبل تكراره.',pre:im.post,target:im.target,topic:topicOf(x)})});
- (state.schoolPlans||[]).forEach(x=>{const a=schoolPlanItem(x);if(a.risk>=30)list.push({id:`schoolplan:${x.id}`,source:'schoolplan',sourceId:x.id,title:`برنامج مدرسي: ${x.title}`,score:a.risk,reason:a.reasons.join(' '),action:a.action,pre:has(x.post)?N(x.post):has(x.pre)?N(x.pre):'',target:80,topic:x.type==='guidance'?'guidance':x.type==='gifted'?'gifted':x.type==='activity'?'activity':x.type==='health'?'health':topicOf(x)})});
+ (state.schoolPlans||[]).forEach(x=>{const a=schoolPlanItem(x);if(a.risk>=30)list.push({id:`schoolplan:${x.id}`,source:'schoolplan',sourceId:x.id,title:`برنامج مدرسي: ${x.title}`,score:a.risk,reason:a.reasons.join(' '),action:a.action,pre:has(x.post)?N(x.post):has(x.pre)?N(x.pre):'',target:80,topic:x.type==='guidance'?'guidance':x.type==='gifted'?'gifted':x.type==='activity'?'activity':x.type==='health'?'health':x.type==='leadership'?'leadership':x.type==='partnership'?'partnership':x.type==='volunteer'?'volunteer':x.type==='ai'?'ai':topicOf(x)})});
  (state.professional||[]).forEach(x=>{const a=professionalItem(x),detected=topicOf(x);if(a.risk>=30)list.push({id:`professional:${x.id}`,source:'professional',sourceId:x.id,title:`تطوير مهني: ${x.title}`,score:a.risk,reason:a.reasons.join(' '),action:a.action,pre:has(x.post)?N(x.post):has(x.pre)?N(x.pre):'',target:85,topic:detected==='general'?'professional':detected})});
  (state.events||[]).forEach(x=>{const a=eventItem(x);if(a.risk>=30)list.push({id:`event:${x.id}`,source:'event',sourceId:x.id,title:`فعالية: ${x.title}`,score:a.risk,reason:a.reasons.join(' '),action:a.action,pre:a.impact??a.satisfaction??'',target:85,topic:topicOf(x)})});
  (state.evidence||[]).forEach(e=>{const a=evidenceItem(e);if(a.risk>=45)list.push({id:`evidence:${e.id}`,source:'evidence',sourceId:e.id,title:`شاهد يحتاج مراجعة: ${e.title}`,score:a.risk,reason:a.reasons.join(' '),action:a.action,pre:a.score,target:70,topic:'evidence'})});
@@ -273,6 +299,10 @@ function rootCauseGuide(topic){
   discipline:{causes:['عدم تحديد نمط الغياب/التأخر والفئات الأكثر تكرارًا','الاعتماد على إجراء توعوي دون متابعة','ضعف الشراكة الأسرية في الحالات المتكررة','غياب تعزيز السلوك الإيجابي'],questions:['متى وأين تتكرر المشكلة؟','من الفئة الأعلى؟','ما السبب القابل للتدخل؟','هل انخفضت الحالات بعد الإجراء؟']},
   guidance:{causes:['البرنامج لا يبدأ من احتياج مقاس','الفئة المستهدفة واسعة وغير محددة','التركيز على التنفيذ دون أثر سلوكي/نفسي قابل للقياس','ضعف المتابعة بعد البرنامج'],questions:['ما الاحتياج المثبت؟','من الفئة المستهدفة تحديدًا؟','ما مؤشر التغير المتوقع؟','متى سيعاد القياس؟']},
   health:{causes:['البرنامج الصحي لا يبدأ من احتياج أو بيانات صحية مدرسية','التركيز على التوعية دون قياس تغير السلوك الصحي','عدم تحديد الفئة الأكثر احتياجًا','ضعف المتابعة أو الإحالة عند الحاجة'],questions:['ما الاحتياج الصحي الذي يبرر البرنامج؟','من الفئة المستهدفة تحديدًا؟','ما السلوك الصحي المتوقع تغيّره؟','كيف سيقاس الأثر بعد التنفيذ؟']},
+  leadership:{causes:['الأولوية القيادية غير مرتبطة بمؤشر أداء واضح','كثرة المهام التنفيذية مقابل ضعف المتابعة التعليمية','القرار لا يستند إلى بيانات كافية أو قياس أثر','توزيع المسؤوليات أو المتابعة غير واضح','ضعف الربط بين التطوير المهني والتحصيل'],questions:['ما النتيجة المدرسية التي يجب أن تتغير؟','ما الدليل الذي يبرر هذا التدخل القيادي؟','من المسؤول وما نقطة المتابعة؟','كيف سيقاس أثر القرار على التعلم أو الأداء؟']},
+  partnership:{causes:['الشراكة لا تبدأ من احتياج مدرسي واضح','أدوار الطرفين غير محددة','التركيز على توقيع الاتفاقية دون قياس الأثر','ضعف الاستدامة أو المتابعة بعد التنفيذ'],questions:['ما الاحتياج الذي تعالجه الشراكة؟','ما مساهمة كل طرف؟','ما الأثر المتوقع على التعلم أو الخدمة؟','كيف ستقاس الاستدامة؟']},
+  volunteer:{causes:['قياس النجاح بعدد الساعات فقط','غياب أثر واضح على المستفيد أو المجتمع','الفئة المشاركة غير محددة','ضعف التوثيق والمتابعة بعد المبادرة'],questions:['ما المشكلة المجتمعية التي تعالجها المبادرة؟','من المستفيد؟','ما الأثر المتوقع غير عدد الساعات؟','كيف سيوثق التغير؟']},
+  ai:{causes:['البرنامج يركز على الحضور لا اكتساب المهارة','عدم تحديد مهارة رقمية قابلة للقياس','غياب منتج أو تطبيق نهائي','عدم وجود قياس قبلي وبعدي أو متابعة للتوظيف'],questions:['ما المهارة الرقمية المستهدفة؟','ما المنتج أو المهمة الأدائية؟','كيف سيقاس التحسن؟','هل وظف المستفيد المهارة بعد البرنامج؟']},
   gifted:{causes:['التركيز على الترشيح دون استمرارية الرعاية','ضعف ربط الموهوب بالبرنامج المناسب','قلة فرص الإثراء أو المتابعة','قياس الإنجاز بعدد المشاركات فقط'],questions:['كم طالبًا انتقل من الكشف إلى الرعاية؟','ما مجال الموهبة؟','ما البرنامج الأنسب؟','ما أثر الرعاية على الأداء/الإنجاز؟']},
   family:{causes:['قنوات تواصل لا تناسب الأسرة','المشاركة تقتصر على الحضور ولا تمتد لدعم التعلم','عدم تحليل الفئات الأقل مشاركة','ضعف التغذية الراجعة للأسرة'],questions:['أي فئة أسرية أقل مشاركة؟','ما نوع المشاركة المطلوبة؟','هل الرسائل مرتبطة بتعلم الأبناء؟','كيف سيقاس أثر المشاركة؟']},
   safety:{causes:['معالجة الملاحظة بعد وقوعها بدل المتابعة الوقائية','نقص التوثيق الدوري للفحص والصيانة','عدم إغلاق البلاغات ضمن زمن محدد','عدم تحليل تكرار مواقع الخطر'],questions:['ما الخطر الأعلى أولوية؟','متى فُحص آخر مرة؟','ما زمن إغلاق البلاغ؟','هل تكررت الملاحظة في الموقع نفسه؟']},
@@ -292,6 +322,10 @@ function solutionProfile(topic,p={}){
   evidence:{owner:'فريق التقويم الذاتي',duration:'أسبوعان',kpi:'ارتفاع ملاءمة الشاهد واكتمال عناصر التنفيذ والنتيجة والمتابعة',actions:['مطابقة الشاهد بعبارة المؤشر وتحديد العنصر غير المثبت.','استكمال الدليل بنتيجة أو متابعة أو قياس أثر.','توثيق التاريخ والمصدر والارتباط بالمؤشر.','إعادة تحليل الملاءمة بعد الاستكمال.']},
   guidance:{owner:'التوجيه الطلابي',duration:'٣–٦ أسابيع',kpi:'تحسن المؤشر السلوكي/النفسي المستهدف لدى الفئة المحددة',actions:['تحديد الاحتياج والفئة المستهدفة من بيانات فعلية.','اختيار تدخل مباشر يناسب السبب لا مجرد نشاط عام.','إشراك الأسرة/المعلم عند الحاجة مع حماية الخصوصية.','قياس التغير بعد التنفيذ وتعديل البرنامج وفق النتيجة.']},
   health:{owner:'مسؤول الإرشاد الصحي',duration:'٢–٦ أسابيع',kpi:'تحسن السلوك أو المؤشر الصحي المستهدف لدى الفئة المحددة',actions:['تحديد الاحتياج الصحي من بيانات أو ملاحظة موثقة.','اختيار تدخل توعوي/وقائي مناسب للفئة والسبب.','ربط البرنامج بإجراء متابعة أو إحالة عند الحاجة مع حماية الخصوصية.','إعادة القياس وتحليل التغير واتخاذ قرار الاستمرار أو التعديل.']},
+  leadership:{owner:'القيادة المدرسية',duration:'٢–٨ أسابيع حسب الأولوية',kpi:'تحسن مؤشر الأداء المدرسي المستهدف مع توثيق القرار والأثر',actions:['ربط التدخل القيادي ببيانات أو فجوة محددة.','تحديد المسؤول ونقطة متابعة ومؤشر إنذار مبكر.','تنفيذ الإجراء مع تمكين الفريق وتوثيق القرارات والشواهد.','إعادة القياس وتحليل الأثر واتخاذ قرار الاستدامة أو التعديل.']},
+  partnership:{owner:'منسق الشراكة المجتمعية',duration:'حسب الشراكة',kpi:'تحقق هدف الشراكة وظهور أثر موثق واستدامة قابلة للقياس',actions:['ربط الشراكة باحتياج أو هدف مدرسي محدد.','تحديد التزامات الطرفين ومؤشر النجاح قبل البدء.','توثيق التنفيذ والنتائج ورضا الشريك والمستفيد.','قياس الأثر واتخاذ قرار الاستدامة أو التوسع أو الإنهاء.']},
+  volunteer:{owner:'منسق العمل التطوعي',duration:'حسب المبادرة',kpi:'تحقق الأثر المجتمعي المستهدف مع توثيق المشاركين والساعات والنتيجة',actions:['تحديد الاحتياج المجتمعي والفئة المستفيدة.','تحديد المستهدف والساعات ومؤشر أثر يتجاوز عدد المشاركين.','تنفيذ المبادرة وتوثيق الشواهد ورضا المستفيد.','تحليل الأثر وتحسين المبادرة للدورة التالية.']},
+  ai:{owner:'منسق التقنية والابتكار',duration:'١–٦ أسابيع',kpi:'تحسن المهارة الرقمية المستهدفة ووجود منتج أو تطبيق قابل للتحقق',actions:['تحديد المهارة الرقمية وخط الأساس قبل البرنامج.','تصميم نشاط أو تحدٍ ينتج عنه منتج/مشروع واضح.','قياس الإكمال والتحسن والمنتجات لا الحضور فقط.','متابعة توظيف المهارة وتحويل النتائج إلى مسار إثرائي أو علاجي.']},
   gifted:{owner:'مسؤول الموهوبين',duration:'فصل دراسي',kpi:'ارتفاع الانتقال من الكشف إلى الرعاية والمشاركة والإنجاز النوعي',actions:['تحليل مسار الطلبة من الترشيح والكشف إلى الرعاية.','ربط كل فئة بفرصة إثرائية مناسبة للمجال.','متابعة المشاركة والمنتج/الإنجاز لا التسجيل فقط.','قياس أثر الرعاية وبناء توصية الاستمرار.']},
   activity:{owner:'مسؤول النشاط',duration:'حسب البرنامج',kpi:'تحقق هدف النشاط ومشاركة الفئة المستهدفة وظهور أثر مقاس',actions:['ربط النشاط باحتياج أو هدف مدرسي واضح.','تحديد مؤشر أثر قبل التنفيذ لا بعده.','تنويع قنوات المشاركة والوصول للفئات الأقل مشاركة.','قياس الأثر والرضا وتحويل النتائج إلى تحسين للدورة التالية.']},
   family:{owner:'فريق الشراكة والتوجيه',duration:'٣–٦ أسابيع',kpi:'ارتفاع المشاركة الأسرية في السلوك/التعلم المستهدف',actions:['تحديد الفئة الأسرية الأقل مشاركة وسبب العزوف.','اختيار قناة ووقت ونوع مشاركة مناسب.','ربط التواصل بهدف تعلم أو دعم محدد.','قياس المشاركة والأثر وإعادة تصميم القناة عند الحاجة.']},
