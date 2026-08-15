@@ -167,14 +167,36 @@ function satisfactionItem(x){
 }
 function schoolPlanItem(x){
  const ratio=has(x.targetCount)&&N(x.targetCount)>0&&has(x.actualCount)?N(x.actualCount)/N(x.targetCount)*100:null;
- const delta=has(x.pre)&&has(x.post)?N(x.post)-N(x.pre):null,overdue=!!(x.date&&x.status!=='done'&&x.date<today());let risk=0,reasons=[];
- if(ratio!==null&&ratio<75){risk+=42;reasons.push(`الوصول للفئة المستهدفة بلغ ${ratio.toFixed(1)}٪ فقط.`)}
- if(x.status==='done'&&!has(x.post)&&has(x.pre)){risk+=32;reasons.push('البرنامج مكتمل دون قياس بعدي للأثر.')}
- if(delta!==null&&delta<=0){risk+=45;reasons.push('القياس البعدي لم يظهر تحسنًا عن القبلي.')}else if(delta!==null&&delta<10){risk+=22;reasons.push(`الأثر محدود (+${delta.toFixed(1)} نقطة).`)}
- if(overdue){risk+=25;reasons.push('موعد التنفيذ مضى والبرنامج غير مكتمل.')}
- const label=risk>=70?'حرج':risk>=45?'يحتاج تعديلًا':risk>=25?'يحتاج متابعة':'مستقر';
- const action=risk>=45?'مراجعة تصميم البرنامج والفئة ومؤشر النجاح، ثم تعديل التنفيذ وإعادة القياس':'استدامة البرنامج مع توثيق عناصر النجاح وقياس الأثر';
- return{participationRatio:ratio,delta,overdue,risk:clamp(risk),label,reasons,action};
+ const pre=has(x.pre)?N(x.pre):null,target=has(x.target)?N(x.target):null,post=has(x.post)?N(x.post):null,direction=x.direction||'up';
+ const rawDelta=pre!==null&&post!==null?post-pre:null,delta=rawDelta===null?null:(direction==='down'?-rawDelta:rawDelta),gap=target!==null&&post!==null?(direction==='down'?post-target:target-post):null,targetReached=target!==null&&post!==null?(direction==='down'?post<=target:post>=target):false;
+ const satisfaction=has(x.satisfaction)?N(x.satisfaction):null;
+ const evidenceCount=(Array.isArray(x.attachments)?x.attachments.length:0)+(String(x.evidenceNotes||x.notes||'').trim()?1:0);
+ const end=x.end||x.date||'',overdue=!!(end&&x.status!=='done'&&end<today());let risk=0,reasons=[];
+ if(!String(x.need||'').trim()){risk+=6;reasons.push('الاحتياج أو المشكلة التي بُني عليها البرنامج غير موثقة بوضوح.');}
+ if(!String(x.successIndicator||'').trim()){risk+=8;reasons.push('مؤشر النجاح غير محدد؛ يصعب الحكم على تحقق الهدف بدقة.');}
+ if(ratio!==null&&ratio<75){risk+=38;reasons.push(`الوصول للفئة المستهدفة بلغ ${ratio.toFixed(1)}٪ فقط.`)}
+ if(x.status==='done'&&has(x.targetCount)&&N(x.targetCount)>0&&!has(x.actualCount)){risk+=18;reasons.push('البرنامج مكتمل دون توثيق العدد الفعلي للمستفيدين.');}
+ if(x.status==='done'&&(pre!==null||target!==null)&&post===null){risk+=30;reasons.push('البرنامج مكتمل دون قياس بعدي للأثر.');}
+ if(post!==null&&target!==null&&!targetReached){risk+=gap>=20?36:gap>=10?24:12;reasons.push(`القياس البعدي أقل من المستهدف بـ ${Math.max(0,gap).toFixed(1)} نقطة.`)}
+ if(delta!==null&&delta<=0){risk+=42;reasons.push('القياس البعدي لم يظهر تحسنًا عن القبلي وفق اتجاه المؤشر.')}else if(delta!==null&&delta<10){risk+=18;reasons.push(`الأثر الإيجابي محدود (+${delta.toFixed(1)} نقطة وفق اتجاه المؤشر).`)}else if(delta!==null){reasons.push(`تحسن المؤشر بمقدار ${delta.toFixed(1)} نقطة وفق الاتجاه المستهدف.`)}
+ if(satisfaction!==null&&satisfaction<75){risk+=22;reasons.push(`رضا المستفيدين منخفض نسبيًا (${satisfaction.toFixed(1)}٪).`)}
+ if(x.status==='done'&&evidenceCount===0){risk+=26;reasons.push('البرنامج مكتمل دون شواهد مرفقة أو وصف موثق للشواهد.');}
+ if(x.status==='done'&&!String(x.results||'').trim()){risk+=12;reasons.push('النتيجة الختامية للبرنامج غير موثقة.');}
+ if(overdue){risk+=25;reasons.push('موعد التنفيذ انتهى والبرنامج غير مكتمل.');}
+ if(risk>=45&&!String(x.rootCause||'').trim())reasons.push('توجد فجوة مرتفعة دون سبب جذري موثق؛ يلزم التحقق قبل تكرار التدخل.');
+ const required=['title','goal','targetGroup','successIndicator','owner'];let complete=required.filter(k=>String(x[k]||'').trim()).length;
+ if(pre!==null)complete++;if(target!==null)complete++;if(x.status!=='done'||post!==null)complete++;if(evidenceCount>0)complete++;
+ const completeness=complete/(required.length+4)*100;
+ const label=risk>=70?'حرج':risk>=45?'يحتاج تعديلًا':risk>=25?'يحتاج متابعة':x.status==='done'?'محقق بصورة مستقرة':'مستقر';
+ const recommendations=[];
+ if(!String(x.successIndicator||'').trim())recommendations.push('حدد مؤشر نجاح رقميًا أو وصفيًا قبل التنفيذ.');
+ if(ratio!==null&&ratio<75)recommendations.push('راجع آلية الوصول للفئة المستهدفة وقنوات الإعلان أو الترشيح.');
+ if(post===null&&x.status==='done')recommendations.push('نفذ قياسًا بعديًا مرتبطًا بنفس المؤشر الذي قيس قبليًا.');
+ if(post!==null&&target!==null&&!targetReached)recommendations.push('حلل سبب الفجوة وعدل التدخل قبل تكراره ثم أعد القياس.');
+ if(evidenceCount===0)recommendations.push('أرفق شاهدًا مباشرًا للتنفيذ والنتيجة وقياس الأثر.');
+ if(!recommendations.length)recommendations.push('استمر في البرنامج ووثق عناصر النجاح لإعادة استخدامها في الخطط القادمة.');
+ const action=risk>=70?'إجراء تصحيحي عاجل: تثبيت السبب الجذري، تعديل التدخل، ثم قياس قصير المدى':risk>=45?'مراجعة تصميم البرنامج والفئة ومؤشر النجاح، ثم تعديل التنفيذ وإعادة القياس':risk>=25?'استكمال القياس والشواهد والمتابعة قبل إغلاق البرنامج':'استدامة البرنامج مع توثيق عناصر النجاح وقياس الأثر';
+ return{participationRatio:ratio,pre,target,post,direction,rawDelta,delta,gap,targetReached,satisfaction,evidenceCount,completeness,overdue,risk:clamp(risk),label,reasons,action,recommendations};
 }
 function professionalItem(x){
  const delta=has(x.pre)&&has(x.post)?N(x.post)-N(x.pre):null,overdue=!!(x.date&&x.status!=='done'&&x.date<today());let risk=0,reasons=[];
@@ -303,7 +325,7 @@ function crossAnalysis(state,standards){
 }
 function contradictions(state,standards){
  const out=[],A=assessmentSummary(state,standards);
- A.rows.forEach(row=>{if(row.level===4&&row.evidence.length&&row.evidence.every(e=>evidenceScoreForIndicator(e,row.i.id)<45))out.push({type:'assessment-evidence',title:row.i.text,message:'التقييم الداخلي مرتفع (٤/٤) لكن جميع الشواهد المرتبطة بهذا المؤشر ضعيفة الملاءمة؛ راجعي التقدير أو استكملي الدليل.'})});
+ A.rows.forEach(row=>{if(row.level===4&&row.evidence.length&&row.evidence.every(e=>evidenceScoreForIndicator(e,row.i.id)<45))out.push({type:'assessment-evidence',title:row.i.text,message:'التقييم الداخلي مرتفع (٤/٤) لكن جميع الشواهد المرتبطة بهذا المؤشر ضعيفة الملاءمة؛ راجع التقدير أو استكمل الدليل.'})});
  (state.operationalPlan||[]).forEach(x=>{const a=operationalItem(x);if(x.status==='done'&&a.achievement!==null&&a.achievement<75)out.push({type:'operational-status',title:x.title,message:'البند مسجل «مكتمل» لكن التقدم المحسوب من خط الأساس إلى المستهدف أقل من ٧٥٪.'})});
  (state.professional||[]).forEach(x=>{if(x.status==='done'&&!has(x.post))out.push({type:'professional-measure',title:x.title,message:'النشاط المهني مسجل منفذًا دون قياس بعدي؛ التنفيذ لا يساوي تحقق الأثر.'})});
  (state.improvements||[]).forEach(x=>{if(x.status==='done'&&!has(x.post))out.push({type:'improvement-measure',title:x.title,message:'خطة التحسين مغلقة دون قياس بعدي؛ لا يمكن الحكم على نجاحها.'})});

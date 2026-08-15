@@ -12,6 +12,7 @@ const emptyState=()=>({
  nafs:[],
  treatmentPlans:[],
  schoolPlans:[],
+ sectionPlans:{guidance:{},activity:{},gifted:{},health:{}},
  operationalPlan:[],
  manualSwot:{strengths:[],weaknesses:[],opportunities:[],threats:[]},
  analysisHistory:[],
@@ -22,7 +23,7 @@ const emptyState=()=>({
  library:[]
 });
 function safeParse(v){try{return JSON.parse(v)}catch{return null}}
-function mergeState(s){const base=emptyState(); if(!s)return base; return {...base,...s,settings:{...base.settings,...(s.settings||{})}}}
+function mergeState(s){const base=emptyState(); if(!s)return base; return {...base,...s,settings:{...base.settings,...(s.settings||{})},sectionPlans:{...base.sectionPlans,...(s.sectionPlans||{})}}}
 function loadState(){return mergeState(safeParse(localStorage.getItem(KEY)))}
 let state=loadState();
 function saveState(){state.version=APP_VERSION;localStorage.setItem(KEY,JSON.stringify(state));return state}
