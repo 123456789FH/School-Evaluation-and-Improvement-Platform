@@ -705,3 +705,148 @@ body[data-v4-route="leadership"] .plan-overview{margin-top:13px;border-radius:15
 @media print{
   .premium-top-nav,.premium-action-dock,.premium-about{display:none!important}
 }
+
+/* =========================================================
+   V4.3 PREMIUM FIX — إصلاح الآيباد/الأيقونات/الأحجام/الرسومات
+   طبقة نهائية فقط ولا تغيّر محركات البيانات أو التحليل
+   ========================================================= */
+:root{
+  --sidebar-w:224px;
+  --topbar-h:64px;
+  --v43-card-radius:14px;
+}
+.v4-icon{width:1.22em;height:1.22em;display:block;flex:0 0 auto;overflow:visible}
+body{font-size:14px}
+#page,#appFooter{margin-right:var(--sidebar-w)}
+.topbar{right:var(--sidebar-w);height:var(--topbar-h);padding-inline:16px;gap:10px}
+.top-menu{width:38px;height:38px;border-radius:10px;border:1px solid var(--premium-line);background:#fff;color:var(--premium-accent-deep);font-size:0}
+.top-menu::before{content:"";width:18px;height:14px;display:block;background:linear-gradient(var(--premium-accent-deep) 0 0) 0 0/100% 1.6px no-repeat,linear-gradient(var(--premium-accent-deep) 0 0) 0 6px/100% 1.6px no-repeat,linear-gradient(var(--premium-accent-deep) 0 0) 0 12px/100% 1.6px no-repeat}
+.top-current{min-width:132px;gap:8px}
+.top-current>span{width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
+.top-current>span .v4-icon{width:19px;height:19px}
+.top-current strong{font-size:12px}.top-current small{font-size:8px;line-height:1.3}
+.top-actions{display:none!important}
+.premium-top-nav{gap:1px}
+.premium-top-link{min-height:38px;padding:5px 8px;font-size:10.5px;border-radius:9px}
+.premium-top-link .ptn-icon{width:24px;height:24px;display:grid;place-items:center}
+.premium-top-link .ptn-icon .v4-icon{width:17px;height:17px}
+
+/* Sidebar: أصغر + قابل للطي */
+.side-nav{width:var(--sidebar-w);box-shadow:-5px 0 20px rgba(13,54,42,.035)}
+.side-brand{min-height:78px;padding:11px 10px;gap:9px}
+.side-brand img{width:46px;height:46px;border-radius:13px}
+.side-brand strong{font-size:11.5px;line-height:1.4}.side-brand span{font-size:8.5px}
+.side-scroll{padding:8px 7px 10px;overflow:auto;overscroll-behavior:contain}
+.side-group{margin-bottom:5px}.side-group-title{font-size:8px;padding:6px 9px 2px}
+.side-link{min-height:38px;grid-template-columns:29px 1fr;gap:7px;border-radius:10px;padding:4px 7px;margin:1px 0;font-size:10.5px}
+.side-icon{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;font-size:inherit}
+.side-icon .v4-icon{width:16px;height:16px}
+.side-foot{gap:6px;padding:7px;background:#fbfdfc}
+.premium-side-card{grid-template-columns:30px 1fr;gap:7px;padding:7px;border-radius:10px}
+.premium-side-card .psc-icon{width:30px;height:30px;border-radius:9px;font-size:inherit}
+.premium-side-card .psc-icon .v4-icon{width:16px;height:16px}
+.premium-side-card strong{font-size:9.5px!important}.premium-side-card span{font-size:7.8px!important}
+.v4-side-collapse{position:absolute;left:-13px;top:29px;width:26px;height:26px;border-radius:50%;border:1px solid var(--premium-line);background:#fff;color:var(--premium-accent-deep);display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 14px rgba(10,52,40,.10);z-index:2}
+.v4-side-collapse .v4-icon{width:13px;height:13px}
+body.side-collapsed{--sidebar-w:72px}
+body.side-collapsed .side-brand{justify-content:center;padding-inline:7px}
+body.side-collapsed .side-brand>div,body.side-collapsed .side-group-title,body.side-collapsed .side-link>span:last-child,body.side-collapsed .side-foot{display:none!important}
+body.side-collapsed .side-link{display:grid;grid-template-columns:1fr;place-items:center;padding:5px;margin:2px 3px}
+body.side-collapsed .side-icon{width:34px;height:34px}
+body.side-collapsed .v4-side-collapse{transform:rotate(180deg)}
+
+/* Hero: أقل ارتفاعًا وأكثر رسمية */
+.hero-v4{padding:14px 0 6px}
+.hero-v4-grid{grid-template-columns:minmax(0,1.28fr) minmax(330px,.72fr);min-height:242px;border-radius:17px;box-shadow:0 8px 24px rgba(10,52,40,.055)}
+.hero-v4-copy{padding:20px 23px 18px}
+.hero-v4-copy:before{right:9px;top:21px;height:36px;width:3px}
+.hero-v4 .kicker{font-size:9px;padding:4px 8px}
+.hero-v4 h1{font-size:clamp(27px,2.6vw,39px);margin:7px 0 4px;letter-spacing:-.4px}
+.hero-v4 p{font-size:11.5px;line-height:1.75;max-width:680px}
+.hero-tags{margin-top:7px}.hero-tags .chip{font-size:8.5px;padding:3px 6px}
+.hero-feature-row{gap:6px;margin-top:9px}
+.hero-feature{min-height:48px;grid-template-columns:25px 1fr;gap:6px;padding:6px 7px;border-radius:10px;font-size:8.7px;line-height:1.45;background:rgba(255,255,255,.92)}
+.hero-feature span:first-child{width:25px;height:25px;border-radius:7px;font-size:inherit;display:grid;place-items:center}
+.hero-feature .v4-icon{width:14px;height:14px}
+.hero-v4-art{min-height:242px;background:transparent}
+.hero-v4-art:after{display:none}
+.premium-hero-scene{height:100%;min-height:242px;position:relative;overflow:hidden}
+.premium-hero-scene>svg{width:100%;height:100%;min-height:242px;display:block}
+.hero-route-badge,.hero-float{position:absolute;display:grid;place-items:center;background:rgba(255,255,255,.92);border:1px solid rgba(var(--premium-accent-rgb),.16);color:var(--premium-accent-deep);box-shadow:0 8px 22px rgba(10,52,40,.08);backdrop-filter:blur(8px)}
+.hero-route-badge{right:22px;top:18px;width:52px;height:52px;border-radius:16px}
+.hero-route-badge .v4-icon{width:27px;height:27px}
+.hero-float{width:38px;height:38px;border-radius:12px}.hero-float .v4-icon{width:18px;height:18px}
+.hero-float-a{left:24px;top:23px}.hero-float-b{left:70px;top:67px}
+
+/* المحتوى: تقليل المربعات والمسافات */
+.section{padding:17px 0}.section-head{margin-bottom:9px}.section-title{font-size:clamp(18px,1.65vw,24px);padding-right:10px}.section-title:before{width:3px}.section-sub{font-size:9.5px}
+.grid{gap:11px}.card{padding:13px;border-radius:var(--v43-card-radius);box-shadow:0 4px 14px rgba(10,52,40,.03)}
+.card h3,.card h4{font-size:13px;margin-bottom:5px}.card p{font-size:10px;line-height:1.65}
+.icon-pill,.module-icon{width:42px;height:42px;border-radius:12px;font-size:inherit;margin-bottom:8px}.icon-pill .v4-icon,.module-icon .v4-icon{width:21px;height:21px}
+.metric-value{font-size:24px}.metric-label{font-size:10px}.metric-delta{font-size:9px}
+.grid-5>.metric-card{min-height:108px;padding:11px}.grid-5>.metric-card .icon-pill{width:37px;height:37px;margin-bottom:6px}.grid-5>.metric-card .metric-value{font-size:22px}.grid-5>.metric-card .metric-label{font-size:9.5px}.grid-5>.metric-card .metric-delta{font-size:8.5px}
+.module-grid{gap:8px}.module-card{min-height:70px;padding:10px;border-radius:12px}.module-card strong{font-size:11.5px}.module-card small{font-size:8.5px}
+.btn{min-height:36px;padding:6px 10px;border-radius:9px;font-size:9.5px}.btn-small{min-height:30px;padding:5px 8px;font-size:9px}
+.tabs{gap:5px;padding-bottom:8px}.tab{padding:5px 8px;font-size:9px}
+
+/* القيادة */
+body[data-v4-route="leadership"] .leadership-roles{gap:9px}
+body[data-v4-route="leadership"] .leadership-role{border-radius:12px}
+body[data-v4-route="leadership"] .leadership-role summary{grid-template-columns:45px 1fr 18px;padding:11px;min-height:84px}
+body[data-v4-route="leadership"] .role-icon{width:43px;height:43px;border-radius:12px;font-size:21px}
+body[data-v4-route="leadership"] .leadership-role summary strong{font-size:12px}
+body[data-v4-route="leadership"] .leadership-role summary small{font-size:9px}
+body[data-v4-route="leadership"] .leadership-pillars{gap:8px}
+body[data-v4-route="leadership"] .leadership-pillar{min-height:112px;padding:10px}
+body[data-v4-route="leadership"] .leadership-pillar .icon-pill{width:38px;height:38px;font-size:19px;margin-bottom:6px}
+body[data-v4-route="leadership"] .leadership-pillar h3{font-size:11px}
+body[data-v4-route="leadership"] .leadership-pillar p{font-size:8.5px;line-height:1.6}
+.premium-action-dock{padding:8px;border-radius:12px}.premium-action-dock .hero-actions{gap:6px}.premium-action-dock .btn{min-height:36px;font-size:9.5px}
+.premium-about{grid-template-columns:38px 1fr;gap:8px;padding:10px;border-radius:12px}.premium-about .pa-icon{width:38px;height:38px;border-radius:11px;font-size:inherit}.premium-about .pa-icon .v4-icon{width:19px;height:19px}.premium-about h3{font-size:11px}.premium-about p{font-size:8.8px}
+
+/* iPad واللابتوب المتوسط: القائمة تصبح Drawer ولا تغطي المحتوى */
+@media(max-width:1390px){
+  :root{--sidebar-w:236px;--topbar-h:62px}
+  #page,#appFooter{margin-right:0!important}
+  .topbar{right:0!important}
+  .side-nav{width:min(82vw,236px);transform:translateX(108%);transition:transform .22s ease;box-shadow:-14px 0 36px rgba(0,0,0,.16)}
+  body.side-open .side-nav{transform:translateX(0)}
+  .side-backdrop{position:fixed;inset:0;background:rgba(4,22,17,.30);z-index:115;display:block;opacity:0;pointer-events:none;transition:.2s}
+  body.side-open .side-backdrop{opacity:1;pointer-events:auto}
+  .top-menu{display:grid!important;place-items:center}
+  .v4-side-collapse{display:none}
+  body.side-collapsed{--sidebar-w:236px}
+  body.side-collapsed .side-brand>div,body.side-collapsed .side-group-title,body.side-collapsed .side-link>span:last-child{display:block!important}
+  body.side-collapsed .side-foot{display:grid!important}
+  body.side-collapsed .side-brand{justify-content:flex-start;padding:11px 10px}
+  body.side-collapsed .side-link{display:grid;grid-template-columns:29px 1fr;place-items:initial;padding:4px 7px;margin:1px 0}
+  body.side-collapsed .side-icon{width:27px;height:27px}
+  .hero-v4-grid{grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr)}
+  .container{width:min(1280px,calc(100% - 24px))}
+}
+@media(min-width:1391px){.top-menu{display:none!important}}
+@media(max-width:1120px){
+  .premium-top-link{padding-inline:6px}.premium-top-link span:last-child{font-size:9.5px}
+  .hero-v4-grid{grid-template-columns:minmax(0,1.2fr) minmax(285px,.8fr)}
+  .grid-5{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .premium-top-nav{display:none!important}
+  .hero-v4-grid{grid-template-columns:1fr;min-height:0}
+  .hero-v4-art{order:-1;min-height:174px;max-height:174px}
+  .premium-hero-scene,.premium-hero-scene>svg{min-height:174px;height:174px}
+  .hero-route-badge{width:44px;height:44px;right:14px;top:12px}.hero-route-badge .v4-icon{width:22px;height:22px}
+  .hero-float{display:none}
+  .hero-v4-copy{padding:16px 17px}
+  .hero-feature-row{grid-template-columns:repeat(2,1fr)}
+  .grid-4,.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-5{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .container{width:calc(100% - 14px)}
+  .topbar{padding-inline:8px}.top-current{min-width:0}.top-current strong{font-size:10.5px}
+  .hero-v4 h1{font-size:25px}.hero-v4 p{font-size:10.5px}.hero-tags{display:none}
+  .hero-feature-row{grid-template-columns:1fr 1fr}
+  .grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr}
+  .premium-action-dock .hero-actions{grid-template-columns:1fr 1fr!important}
+}
