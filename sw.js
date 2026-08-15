@@ -1,11 +1,68 @@
-const CACHE='school-improvement-v4.0.0';
-const ASSETS=["./", "index.html", "manifest.json", "assets/css/styles.css", "assets/js/data.js", "assets/js/storage.js", "assets/js/engine.js", "assets/js/document-intelligence.js", "assets/js/report-export.js", "assets/js/app.js", "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/images/leadership-hero.png", "assets/images/heroes/activity.svg", "assets/images/heroes/ai.svg", "assets/images/heroes/assessment.svg", "assets/images/heroes/dashboard.svg", "assets/images/heroes/events.svg", "assets/images/heroes/evidence.svg", "assets/images/heroes/gifted.svg", "assets/images/heroes/guidance.svg", "assets/images/heroes/health.svg", "assets/images/heroes/improvement.svg", "assets/images/heroes/intelligence.svg", "assets/images/heroes/leadership.svg", "assets/images/heroes/nafs.svg", "assets/images/heroes/operational.svg", "assets/images/heroes/partnership.svg", "assets/images/heroes/professional.svg", "assets/images/heroes/reports.svg", "assets/images/heroes/satisfaction.svg", "assets/images/heroes/settings.svg", "assets/images/heroes/volunteer.svg"];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{
- if(e.request.method!=='GET')return;
- e.respondWith(caches.match(e.request).then(cached=>cached||fetch(e.request).then(resp=>{
-  if(resp&&resp.ok){const copy=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
-  return resp;
- }).catch(()=>e.request.mode==='navigate'?caches.match('./'):Response.error())));
+const CACHE='school-improvement-v4.1.0';
+const CORE=[
+  './','index.html','manifest.json',
+  'assets/css/styles.css',
+  'assets/js/data.js','assets/js/storage.js','assets/js/engine.js',
+  'assets/js/document-intelligence.js','assets/js/report-export.js','assets/js/app.js',
+  'assets/icons/icon-192.png','assets/icons/icon-512.png'
+];
+
+self.addEventListener('install',event=>{
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    await Promise.allSettled(CORE.map(async url=>{
+      try{
+        const response=await fetch(url,{cache:'reload'});
+        if(response.ok)await cache.put(url,response.clone());
+      }catch(_){/* installation should not fail because one optional asset is unavailable */}
+    }));
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+async function networkFirst(request){
+  const cache=await caches.open(CACHE);
+  try{
+    const fresh=await fetch(request,{cache:'no-store'});
+    if(fresh&&fresh.ok)await cache.put(request,fresh.clone());
+    return fresh;
+  }catch(_){
+    return (await cache.match(request)) || (request.mode==='navigate' ? await cache.match('./') : Response.error());
+  }
+}
+
+async function staleWhileRevalidate(request){
+  const cache=await caches.open(CACHE);
+  const cached=await cache.match(request);
+  const update=fetch(request).then(async response=>{
+    if(response&&response.ok)await cache.put(request,response.clone());
+    return response;
+  }).catch(()=>null);
+  return cached || await update || Response.error();
+}
+
+self.addEventListener('fetch',event=>{
+  const request=event.request;
+  if(request.method!=='GET')return;
+  const url=new URL(request.url);
+  if(url.origin!==self.location.origin)return;
+
+  const isFreshCritical=
+    request.mode==='navigate' ||
+    /\.(?:html?|css|js|json)$/i.test(url.pathname) ||
+    url.pathname.endsWith('/');
+
+  event.respondWith(isFreshCritical ? networkFirst(request) : staleWhileRevalidate(request));
+});
+
+self.addEventListener('message',event=>{
+  if(event.data==='SKIP_WAITING')self.skipWaiting();
 });
