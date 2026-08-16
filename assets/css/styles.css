@@ -850,3 +850,81 @@ body[data-v4-route="leadership"] .leadership-pillar p{font-size:8.5px;line-heigh
   .grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr}
   .premium-action-dock .hero-actions{grid-template-columns:1fr 1fr!important}
 }
+
+/* =========================================================
+   V4.4 — الأنظمة والمنصات الرسمية
+   وصول موحّد للخدمات الحكومية المساندة للعمل المدرسي
+   ========================================================= */
+.official-platforms-group{margin-top:2px}
+.official-platforms-toggle{
+  width:100%;
+  border:1px solid transparent;
+  background:transparent;
+  text-align:right;
+  cursor:pointer;
+  appearance:none;
+}
+.official-platforms-toggle.open{
+  background:var(--premium-accent-soft,#edf8f3);
+  border-color:rgba(var(--premium-accent-rgb,15,116,85),.14);
+  color:var(--premium-accent-deep,#0a4f3d);
+}
+.official-platforms-label{display:flex;align-items:center;justify-content:space-between;gap:7px;min-width:0}
+.official-platforms-label>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.official-platforms-chevron{font-size:11px;line-height:1;transition:transform .2s ease;opacity:.72}
+.official-platforms-toggle[aria-expanded="true"] .official-platforms-chevron{transform:rotate(180deg)}
+.official-platforms-menu{
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  pointer-events:none;
+  display:grid;
+  gap:3px;
+  margin:0 4px;
+  transition:max-height .24s ease,opacity .18s ease,margin .2s ease;
+}
+.official-platforms-menu.open{max-height:420px;opacity:1;pointer-events:auto;margin:5px 4px 7px}
+.official-platform-link{
+  display:grid;
+  grid-template-columns:25px minmax(0,1fr) 14px;
+  align-items:center;
+  gap:6px;
+  padding:6px 7px;
+  min-height:35px;
+  border:1px solid #e4ece8;
+  border-radius:9px;
+  background:#fbfdfc;
+  color:#385249;
+  font-size:9.6px;
+  font-weight:800;
+  line-height:1.35;
+  transition:.16s ease;
+}
+.official-platform-link:hover,.official-platform-link:focus-visible{
+  background:#f0f8f4;
+  border-color:rgba(var(--premium-accent-rgb,15,116,85),.22);
+  color:var(--premium-accent-deep,#0a4f3d);
+  transform:translateX(-1px);
+  outline:none;
+}
+.official-platform-link .opl-icon{
+  width:25px;height:25px;border-radius:8px;display:grid;place-items:center;
+  background:#fff;border:1px solid #e6eeea;font-size:13px
+}
+.official-platform-link .opl-name{min-width:0}
+.official-platform-link .opl-external{font-size:10px;opacity:.55;text-align:left}
+.official-platforms-note{
+  padding:6px 8px 1px;color:#819088;font-size:7.6px;line-height:1.55
+}
+body.side-collapsed .official-platforms-menu,
+body.side-collapsed .official-platforms-note{display:none!important}
+body.side-collapsed .official-platforms-toggle .official-platforms-label{display:none!important}
+@media(max-width:1390px){
+  body.side-collapsed .official-platforms-toggle .official-platforms-label{display:flex!important}
+  body.side-collapsed .official-platforms-menu.open{display:grid!important}
+  body.side-collapsed .official-platforms-note{display:block!important}
+}
+@media(max-width:620px){
+  .official-platform-link{font-size:9.2px;min-height:34px}
+}
+@media print{.official-platforms-group{display:none!important}}
