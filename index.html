@@ -3,29 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b5742">
-  <meta name="description" content="منصة التقويم والتحسين المدرسي — منصة مؤسسية للتقويم والتخطيط والتحليل وقياس الأثر">
+  <meta name="theme-color" content="#0f6b4b">
+  <meta name="description" content="منصة مؤسسية مدرسية للتقويم والتحسين والقيادة والخطط وقياس الأثر والتقارير">
   <title>منصة التقويم والتحسين المدرسي</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="assets/css/styles.css?v=4.3.0">
+  <link rel="stylesheet" href="assets/css/styles.css?v=4.4.0">
 </head>
 <body>
   <div id="appHeader"></div>
   <main id="page"></main>
   <div id="appFooter"></div>
   <div id="toast" class="toast" aria-live="polite"></div>
+  <script src="assets/js/data.js?v=4.0.0"></script>
+  <script src="assets/js/storage.js?v=4.0.0"></script>
+  <script src="assets/js/engine.js?v=4.0.0"></script>
+  <script src="assets/js/document-intelligence.js?v=4.0.0"></script>
+  <script src="assets/js/report-export.js?v=4.0.0"></script>
+  <script src="assets/js/app.js?v=4.0.0"></script>
+  <script>
+  (function(){
+    'use strict';
+    const PLATFORMS=[
+      {name:'نظام نور',icon:'🎓',url:'https://noor.moe.gov.sa/'},
+      {name:'نظام فارس',icon:'🧾',url:'https://sshr.moe.gov.sa/'},
+      {name:'منصة مدرستي',icon:'🏫',url:'https://schools.madrasati.sa/'},
+      {name:'المنصة الوطنية للعمل التطوعي',icon:'🤝',url:'https://nvg.gov.sa/'},
+      {name:'هيئة تقويم التعليم والتدريب',icon:'📊',url:'https://etec.gov.sa/ar/home'},
+      {name:'المعهد الوطني للتطوير المهني التعليمي',icon:'🎯',url:'https://my.gov.sa/ar/agencies/17978'}
+    ];
+    let opened=false;
 
-  <!-- محركات المنصة الأصلية: لم يتم تغيير العقل التحليلي أو التخزين -->
-  <script src="assets/js/data.js?v=4.3.0"></script>
-  <script src="assets/js/storage.js?v=4.3.0"></script>
-  <script src="assets/js/engine.js?v=4.3.0"></script>
-  <script src="assets/js/document-intelligence.js?v=4.3.0"></script>
-  <script src="assets/js/report-export.js?v=4.3.0"></script>
-  <script src="assets/js/app.js?v=4.3.0"></script>
+    function closeDrawer(){document.body.classList.remove('side-open')}
+    function setOpen(group,value){
+      opened=!!value;
+      const btn=group.querySelector('.official-platforms-toggle');
+      const menu=group.querySelector('.official-platforms-menu');
+      if(!btn||!menu)return;
+      btn.setAttribute('aria-expanded',opened?'true':'false');
+      btn.classList.toggle('open',opened);
+      menu.classList.toggle('open',opened);
+    }
+    function injectOfficialPlatforms(){
+      const scroll=document.querySelector('#sideNav .side-scroll');
+      if(!scroll||scroll.querySelector('#officialPlatformsGroup'))return;
 
-  <!-- طبقة الواجهة V4.2: بصرية وتفاعلية فقط، ولا تمس البيانات أو التحليل -->
-  <script src="assets/js/v4-ui.js?v=4.3.0"></script>
+      const group=document.createElement('div');
+      group.className='side-group official-platforms-group';
+      group.id='officialPlatformsGroup';
+      group.innerHTML=`
+        <div class="side-group-title">الخدمات الرسمية</div>
+        <button type="button" class="side-link official-platforms-toggle" aria-expanded="false" aria-controls="officialPlatformsMenu">
+          <span class="side-icon" aria-hidden="true">🏛️</span>
+          <span class="official-platforms-label"><span>الأنظمة والمنصات الرسمية</span><b class="official-platforms-chevron" aria-hidden="true">⌄</b></span>
+        </button>
+        <div class="official-platforms-menu" id="officialPlatformsMenu">
+          ${PLATFORMS.map(p=>`<a class="official-platform-link" href="${p.url}" target="_blank" rel="noopener noreferrer" title="فتح ${p.name} في الموقع الرسمي"><span class="opl-icon" aria-hidden="true">${p.icon}</span><span class="opl-name">${p.name}</span><span class="opl-external" aria-hidden="true">↗</span></a>`).join('')}
+          <div class="official-platforms-note">تفتح الروابط في مواقعها الرسمية خارج المنصة.</div>
+        </div>`;
+
+      const groups=[...scroll.querySelectorAll(':scope > .side-group')];
+      const lastGroup=groups[groups.length-1];
+      if(lastGroup)scroll.insertBefore(group,lastGroup);else scroll.appendChild(group);
+
+      const toggle=group.querySelector('.official-platforms-toggle');
+      toggle.addEventListener('click',()=>setOpen(group,!opened));
+      group.querySelectorAll('.official-platform-link').forEach(a=>a.addEventListener('click',closeDrawer));
+      setOpen(group,opened);
+    }
+
+    const header=document.getElementById('appHeader');
+    if(header){
+      const observer=new MutationObserver(()=>requestAnimationFrame(injectOfficialPlatforms));
+      observer.observe(header,{childList:true,subtree:true});
+    }
+    document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(injectOfficialPlatforms));
+    window.addEventListener('hashchange',()=>setTimeout(injectOfficialPlatforms,0));
+    document.addEventListener('keydown',e=>{
+      if(e.key!=='Escape'||!opened)return;
+      const group=document.getElementById('officialPlatformsGroup');
+      if(group)setOpen(group,false);
+    });
+  })();
+  </script>
 </body>
 </html>
